@@ -1,0 +1,18 @@
+- name: Install Python packages from requirements.txt
+  hosts: all
+  become: yes  # Use sudo (if necessary)
+  tasks:
+    - name: Ensure virtualenv is installed
+      apt:
+        name: python3-venv
+        state: present
+    
+    - name: Create a virtual environment (if it doesn't exist)
+      command: python3 -m venv /home/ubuntu/kezan/venvs/aivenv
+      args:
+        creates: /home/ubuntu/kezan/venvs/aivenv
+    
+    - name: Install requirements from requirements.txt
+      pip:
+        requirements: /path/to/your/requirements.txt
+        virtualenv: /home/ubuntu/kezan/venvs/aivenv
