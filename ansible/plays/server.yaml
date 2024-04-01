@@ -35,14 +35,4 @@
         name: gunicorn
         state: present
 
-    - name: Install BeautifulSoup with pip
-      pip:
-        name: beautifulsoup4  # Corrected the package name to 'beautifulsoup4'
-        state: present
-
-    - name: Install BeautifulSoup with pip
-      pip:
-        name: beautifulsoup4  # Corrected the package name to 'beautifulsoup4'
-        state: present
-            
     tags: [ 'python_packages' ]

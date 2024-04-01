@@ -1,0 +1,37 @@
+- name: Setup Python environment, copy requirements, and set OpenAI API key
+  hosts: all
+  become: yes  # Use sudo (if necessary)
+  vars_files:
+    - /mnt/c/Users/Andre/OneDrive/azj/kezan/config/ansible/arcturis/arcturis.yaml
+  tasks:
+    - name: Ensure virtualenv is installed
+      apt:
+        name: python3-venv
+        update_cache: yes
+        cache_valid_time: 3600
+        state: present
+
+    - name: Create a virtual environment (if it doesn't exist)
+      command: python3 -m venv /home/ubuntu/kezan/venvs/aivenv
+      args:
+        creates: /home/ubuntu/kezan/venvs/aivenv
+
+    - name: Ensure ansible/req directory exists
+      ansible.builtin.file:
+        path: /home/ubuntu/kezan/config/ansible/req
+        state: directory
+        mode: '0755'
+
+    - name: Copy requirements file to server
+      copy:
+        src: /mnt/c/Users/Andre/OneDrive/azj/kezan/config/ansible/req/aivenvreq.txt
+        dest: /home/ubuntu/kezan/config/ansible/req/aivenvreq.txt
+
+    - name: Install requirements from requirements.txt
+      command: /home/ubuntu/kezan/venvs/aivenv/bin/pip install -r /home/ubuntu/kezan/config/ansible/req/aivenvreq.txt
+
+    - name: Set OpenAI API key as a global environment variable from Vault
+      ansible.builtin.lineinfile:
+        path: /etc/environment
+        line: 'OPENAI_API_KEY="{{ OPENAI_API_KEY }}"'
+        create: yes

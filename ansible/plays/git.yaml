@@ -1,0 +1,40 @@
+---
+- hosts: kezan
+  become: yes  # Use sudo for the tasks
+  tasks:
+
+    - name: Install Git
+      apt: 
+        name: git
+        state: latest
+      become: yes
+
+    - name: Ensure .ssh directory exists for the user
+      file:
+        path: "/home/ubuntu/.ssh"
+        state: directory
+        mode: '0700'
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Copy SSH private key for GitHub
+      copy:
+        src: "/mnt/c/Users/Andre/OneDrive/azj/kezan/config/ansible/arcturis/ghkey.txt"  # Adjust the path as needed
+        dest: "/home/ubuntu/.ssh/id_rsa"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0600'
+
+    - name: Copy SSH public key for GitHub
+      copy:
+        src: "/mnt/c/Users/Andre/OneDrive/azj/kezan/config/ansible/arcturis/ghkey.pub"  # Adjust the path as needed
+        dest: "/home/ubuntu/.ssh/id_rsa.pub"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+
+    - name: Add GitHub.com to known hosts
+      known_hosts:
+        name: github.com
+        key: "{{ lookup('pipe', 'ssh-keyscan -H github.com') }}"
+        path: "/home/ubuntu/.ssh/known_hosts"
