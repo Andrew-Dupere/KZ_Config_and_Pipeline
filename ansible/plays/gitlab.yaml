@@ -1,5 +1,4 @@
----
-- name: Setup GitLab
+- name: Setup GitLab Runner
   hosts: kezan
   become: true
 
@@ -8,23 +7,40 @@
       apt:
         name: "{{ item }}"
         state: present
-      with_items:
+      loop:
         - curl
         - openssh-server
         - ca-certificates
         - postfix
 
-    - name: Add GitLab repository
+    - name: Add GitLab Runner repository
       apt_repository:
-        repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/ubuntu/ xenial main"
+        repo: "deb https://packages.gitlab.com/runner/gitlab-runner/ubuntu/ xenial main"
         state: present
-        filename: 'gitlab-ce'
+        filename: 'gitlab-runner'
         update_cache: yes
 
-    - name: Install GitLab
+    - name: Install GitLab Runner
       apt:
-        name: gitlab-ce
+        name: gitlab-runner
         state: present
 
-    - name: Reconfigure GitLab
-      command: gitlab-ctl reconfigure
+    - name: Load GitLab token from arcturis.yaml
+      include_vars:
+        file: arcturis.yaml
+        name: gitlab_token_vars
+
+    - name: Register GitLab Runner
+      command: |
+        gitlab-runner register \
+          --non-interactive \
+          --url "https://gitlab.com/" \
+          --registration-token "{{ gitlab_token_vars.gitlab_token }}" \
+          --executor "shell" \
+          --description "My GitLab Runner"
+
+    - name: Start GitLab Runner
+      service:
+        name: gitlab-runner
+        state: started
+        enabled: yes
