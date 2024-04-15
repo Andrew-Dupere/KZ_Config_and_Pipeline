@@ -1,0 +1,26 @@
+---
+- name: Configure repo
+  hosts: kezan
+  become: yes
+  vars:
+    github_repo_url: "https://github.com/yourusername/yourrepository.git"
+    deploy_directory: "/path/to/deploy"
+
+  tasks:
+    - name: Create Deploy Directory
+      file:
+        path: "{{ deploy_directory }}"
+        state: directory
+        mode: "0755"  # Set the permissions as needed
+
+    - name: Install Git
+      apt:
+        name: git
+        state: present  # Ensure that Git is installed
+
+    - name: Clone GitHub Repository
+      git:
+        repo: "{{ https://github.com/Andrew-Dupere/demotraders }}"
+        dest: "{{ deploy_directory }}"
+        clone: yes
+        update: yes  # Ensure that the repository is up to date

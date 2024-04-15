@@ -1,0 +1,35 @@
+---
+#find all git repos in a given directory and export to the server
+- name: Clone and Sync Git Repositories
+  hosts: #kezan
+  become: yes
+  vars:
+    source_directories:
+      - /path/to/source_directory1
+      - /path/to/source_directory2
+      # Add more source directories as needed
+    target_directory: /path/to/target_directory
+
+  tasks:
+    - name: Create target directory if it doesn't exist
+      file:
+        path: "{{ target_directory }}"
+        state: directory
+
+    - name: Install Git
+      package:
+        name: git
+        state: present
+
+    - name: Clone and sync Git repositories
+      ansible.builtin.shell: |
+        for source_directory in "{{ source_directories }}"; do
+          cd "$source_directory"
+          for directory in */.git/; do
+            repo_directory="$(dirname "$directory")"
+            repo_name="$(basename "$repo_directory")"
+            target_repo_directory="{{ target_directory }}/$repo_name"
+            git clone --mirror "$repo_directory" "$target_repo_directory"
+            git -C "$target_repo_directory" fetch --prune
+          done
+        done

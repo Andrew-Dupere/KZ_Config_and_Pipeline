@@ -1,4 +1,7 @@
 ---
+
+#please add packages required for running selenium firefox bots
+
 - name: kezan config
   hosts: kezan
   become: true  # Run tasks with sudo (root) privileges

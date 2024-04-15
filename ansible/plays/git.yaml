@@ -3,6 +3,8 @@
   become: yes  # Use sudo for the tasks
   tasks:
 
+  #please add winget install --id GitHub.cli -e in the proper location
+
     - name: Install Git
       apt: 
         name: git
@@ -19,7 +21,7 @@
 
     - name: Copy SSH private key for GitHub
       copy:
-        src: "/mnt/c/Users/Andre/OneDrive/azj/kezan/config/ansible/arcturis/ghkey.txt"  # Adjust the path as needed
+        src: "/mnt/c/Users/Andre/OneDrive/azj/kezan/config/ansible/arcturis/ghkey.txt"  
         dest: "/home/ubuntu/.ssh/id_rsa"
         owner: ubuntu
         group: ubuntu
@@ -27,7 +29,7 @@
 
     - name: Copy SSH public key for GitHub
       copy:
-        src: "/mnt/c/Users/Andre/OneDrive/azj/kezan/config/ansible/arcturis/ghkey.pub"  # Adjust the path as needed
+        src: "/mnt/c/Users/Andre/OneDrive/azj/kezan/config/ansible/arcturis/ghkey.pub"  
         dest: "/home/ubuntu/.ssh/id_rsa.pub"
         owner: ubuntu
         group: ubuntu
@@ -38,3 +40,4 @@
         name: github.com
         key: "{{ lookup('pipe', 'ssh-keyscan -H github.com') }}"
         path: "/home/ubuntu/.ssh/known_hosts"
+
