@@ -3,11 +3,11 @@
   hosts: kezan
   become: yes
   vars:
-    github_repo_url: "https://github.com/yourusername/yourrepository.git"
-    deploy_directory: "/path/to/deploy"
+    github_repo_url: "https://github.com/Andrew-Dupere/demotraders.git"
+    deploy_directory: "/home/ubuntu/kezan/apps/demotraders"
 
   tasks:
-    - name: Create Deploy Directory
+    - name: Create Demo Traders Directory
       file:
         path: "{{ deploy_directory }}"
         state: directory
@@ -20,7 +20,11 @@
 
     - name: Clone GitHub Repository
       git:
-        repo: "{{ https://github.com/Andrew-Dupere/demotraders }}"
+        repo: "{{ github_repo_url }}"
         dest: "{{ deploy_directory }}"
         clone: yes
         update: yes  # Ensure that the repository is up to date
+        
+    - name: Configure Git safe.directory
+      command: git config --global --add safe.directory /home/ubuntu/kezan/apps/demotraders
+      become: yes

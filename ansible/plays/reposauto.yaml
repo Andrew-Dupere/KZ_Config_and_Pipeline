@@ -1,4 +1,5 @@
 ---
+#TEST#
 #find all git repos in a given directory and export to the server
 - name: Clone and Sync Git Repositories
   hosts: #kezan
