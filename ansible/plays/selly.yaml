@@ -1,0 +1,43 @@
+---
+#please add wget https://github.com/mozilla/geckodriver/releases/download/v0.31.0/geckodriver-v0.31.0-linux64.tar.gz
+
+- name: Install Selenium dependencies on Ubuntu
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - firefox
+          - geckodriver
+        state: present
+
+    - name: Install Selenium and related packages
+      pip:
+        name:
+          - selenium
+          - pyvirtualdisplay
+        state: present
+
+    - name: Create a directory for Selenium scripts
+      file:
+        path: /opt/selenium
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Copy Selenium script to the server
+      copy:
+        src: selenium_script.py
+        dest: /opt/selenium/selenium_script.py
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'

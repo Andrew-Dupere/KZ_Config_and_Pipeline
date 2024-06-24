@@ -1,0 +1,48 @@
+- name: Configure MySQL Server
+  hosts: kezan
+  become: yes
+  vars_files:
+    - /mnt/c/Users/Andre/OneDrive/azj/kezan/config/ansible/arcturis/sql.yaml
+  tasks:
+    - name: Install MySQL Server
+      apt:
+        name: mysql-server
+        update_cache: yes
+
+    - name: Install Python MySQL module (PyMySQL)
+      package:
+        name: python3-pymysql
+        state: present
+      become: yes
+      become_user: root
+
+    - name: Configure MySQL to allow remote connections
+      lineinfile:
+        path: /etc/mysql/mysql.conf.d/mysqld.cnf
+        regexp: '^bind-address.*'
+        line: 'bind-address = 0.0.0.0'
+      notify: restart mysql
+
+    - name: Create MySQL User Account
+      mysql_user:
+        name: "andrew"
+        password: "{{ mysqlp }}"
+        host: "{{ item }}"
+        priv: '*.*:ALL,GRANT'
+        state: present
+      with_items:
+        - '{{ ansible_default_ipv4.address }}'
+        - '%'
+      notify: restart mysql
+
+    - name: Allow MySQL port in firewall
+      ufw:
+        rule: allow
+        port: '3306'
+        proto: tcp
+
+  handlers:
+    - name: restart mysql
+      service:
+        name: mysql
+        state: restarted
